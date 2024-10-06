@@ -1,6 +1,6 @@
 {
   "name": "gulp-dropbox-adapter",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "repository": "https://github.com/gulpetl/gulp-dropbox-adapter",
   "description": "Upload/download files to/from DropBox",
   "main": "dist/js/plugin.js",
