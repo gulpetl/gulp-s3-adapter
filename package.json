@@ -1,8 +1,8 @@
 {
-  "name": "gulp-api-adapter",
-  "version": "0.0.5",
-  "repository": "https://github.com/gulpetl/gulp-api-adapter",
-  "description": "Upload/download files to/from REST APIs (or any other http/https endpoints)",
+  "name": "gulp-dropbox-adapter",
+  "version": "0.0.0",
+  "repository": "https://github.com/gulpetl/gulp-dropbox-adapter",
+  "description": "Upload/download files to/from DropBox",
   "main": "dist/js/plugin.js",
   "typings": "dist/types/plugin.d.ts",
   "files": [
@@ -17,6 +17,13 @@
   },
   "author": "peterl@sbcotton.com",
   "license": "MIT",
+  "node-red": {
+    "version": ">=2.0.0",
+    "nodes": {
+      "dropbox.src": "dropbox_src.js",
+      "dropbox.dest": "dropbox_dest.js"
+    }
+  },
   "keywords": [
     "gulpplugin",
     "request",
@@ -30,13 +37,16 @@
   ],
   "homepage": "https://gulpetl.com",
   "dependencies": {
+    "dropbox": "^10.34.0",
     "from2": "^2.3.0",
     "gulp-error-handle": "^1.0.1",
     "loglevel": "^1.9.1",
+    "merge": "^2.1.1",
     "pkginfo": "^0.4.1",
     "plugin-error": "^2.0.1",
     "request": "^2.88.2",
     "rimraf": "^6.0.1",
+    "stream-combiner": "^0.2.2",
     "through2": "^4.0.2",
     "vinyl": "^3.0.0"
   },

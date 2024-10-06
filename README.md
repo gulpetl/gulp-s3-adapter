@@ -1,10 +1,8 @@
-# gulp-api-adapter #
+# gulp-dropbox-adapter #
 
-This plugin allows gulp tasks to interact with REST APIs or other http/https endpoints. It provides a .src() function which replaces gulp.src(), allowing remote files to be downloaded as the starting point for a gulp task. There is also a .dest() function, which allows files in a gulp stream to be uploaded.
+This plugin allows gulp tasks to interact with DropBox APIs. It provides a .src() function which replaces gulp.src(), allowing remote files to be downloaded as the starting point for a gulp task. There is also a .dest() function, which allows files in a gulp stream to be uploaded.
 
-Finally, there is a .request() function, which passes each file as the body of an HTTP request and returns the response as a separate file.
-
-This plugin is a gulp wrapper for [request](https://www.npmjs.com/package/request).
+<!-- This plugin is a gulp wrapper for [request](https://www.npmjs.com/package/request). -->
 
 ## Usage ##
 

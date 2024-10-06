@@ -10,29 +10,26 @@ import * as request from 'request'
 import * as path from 'path'
 const from2 = require('from2')
 import { parse as urlParse } from 'url'
-import * as fs from 'fs';
+// import * as fs from 'fs';
+
+import { Dropbox, Error, sharing } from 'dropbox';
+
 
 /* This is a gulp plugin. It is compliant with best practices for Gulp plugins (see
 https://github.com/gulpjs/gulp/blob/master/docs/writing-a-plugin/guidelines.md#what-does-a-good-plugin-look-like ) */
 
-export function src(this: any, url:string, options: any) {
-  let result
+export function src(this: any, url:string, configObj: any) {
+  let result: any;
+  if (!configObj) configObj = {}
+
   try {
     let fileName : string = urlParse(url).pathname || "apiResult.dat"
     fileName = path.basename(fileName)
 
-    let vinylFile:Vinyl
-    // create a file wrapper that will pretend to gulp that it came from the path represented by pretendFilePath
-    vinylFile = new Vinyl({
-      base: path.dirname(fileName),    
-      path:fileName
-      // contents:
-      // we'll set the contents below, for clarity
-    });
-
     // from2 returns a writable stream; we put the vinyl file into the stream. This is the core of gulp: Vinyl files
     // inside streams
-    result = from2.obj([vinylFile])
+    // result = from2.obj([vinylFile])
+    result = from2.obj()
 
     //
     // Now we set the contents of our vinyl file. For now we're using streams; we'll add buffer support later
@@ -49,16 +46,50 @@ export function src(this: any, url:string, options: any) {
     // this works: same idea as above, but a cleaner
 
     // make a copy of configObj specific to this file, adding url and leaving original unchanged
-    let optionsCopy = Object.assign({}, options, {"url":url})
+    // let optionsCopy = Object.assign({}, configObj, {"url":url})
     
-    vinylFile.contents = request(optionsCopy).pipe(through2.obj());
+    if (!configObj.buffer)
+      // vinylFile.contents = request(optionsCopy).pipe(through2.obj());      
+      throw new PluginError(PLUGIN_NAME, "Streaming not available")
+    else {
+      let dbx = new Dropbox(configObj);
+
+      // console.log("uploading...")
+      // TODO: don't ignore subfolders
+      dbx.filesDownload({ path: url})
+      // .filesUpload({ path: path.posix.join(directory,file.basename), contents: file.contents as Buffer, mode:mode as any })
+      .then((response:any) => {
+        // console.log(response.result);
+        let vinylFile = new Vinyl({
+          // base: response.name,   
+          cwd:'/', // just guessing here; not sure if this is the right approach. But it seams to work as intended...
+          path:response.result.path_lower,
+          contents:response.result.fileBinary
+        });
+      
+        
+
+          result.push(vinylFile)
+          // cb(null, file)
+          // console.log("worked!")
+      })
+      .catch ((err) => {
+          console.error("promise error: ", JSON.stringify(err));
+          // cb(err)
+          // throw(err)
+          // node.error(err, msg);
+          // result.emit(new PluginError(PLUGIN_NAME, err))
+      })
+    }
+
+
   } 
   catch (err:any) {
     // emitting here causes some other error: TypeError: Cannot read property 'pipe' of undefined
     // result.emit(new PluginError(PLUGIN_NAME, err))
     
     // For now, bubble error up to calling function
-    throw new PluginError(PLUGIN_NAME, err)
+    // throw new PluginError(PLUGIN_NAME, err)
   }
 
   return result
@@ -155,3 +186,65 @@ function requestFunc(configObj: any) {
   return strm
 }
 
+
+// export function dest(this: any, url:string, options: any) {
+export function dest(directory:string, configObj: any) {
+    if (!configObj) configObj = {}
+    // override configObj defaults here, if needed
+    // if (configObj.header === undefined) configObj.header = true
+  
+    // creating a stream through which each file will pass - a new instance will be created and invoked for each file 
+    // see https://stackoverflow.com/a/52432089/5578474 for a note on the "this" param
+    const strm = through2.obj(function (this: any, file: Vinyl, encoding: string, cb: Function) {
+      const self = this
+      let returnErr: any = null
+
+      if (file.isNull()) {
+        // return empty file
+        return cb(returnErr, file)
+      }
+      else if (file.isBuffer()) {
+        try {
+          // load file location settings, setup dropbox client
+          let dbx = new Dropbox(configObj);
+  
+          let mode;
+          // if (msg.payload?.result?.rev)
+          //     mode = { ".tag": "update", "update": msg.payload?.result?.rev };
+          // else
+              mode = { ".tag": "overwrite" };
+  
+          // console.log("uploading...")
+          // TODO: don't ignore subfolders
+          dbx.filesUpload({ path: path.posix.join(directory,file.basename), contents: file.contents as Buffer, mode:mode as any })
+          .then((response) => {
+              // return msg;
+              cb(null, file)
+              // console.log("worked!")
+          })
+          .catch ((err) => {
+              console.error(JSON.stringify(err));
+              cb(err)
+              // throw(err)
+              // node.error(err, msg);
+          })
+          
+        }
+        catch (err) {        
+          // console.log(err);
+          cb(err)
+        }
+      }
+      else if (file.isStream()) {
+        returnErr = new PluginError(PLUGIN_NAME, "Streaming not available");
+        // result.emit(returnErr)
+
+        return cb(returnErr, file)
+      }
+
+
+    });
+
+
+    return strm;
+}

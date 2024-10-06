@@ -1,0 +1,100 @@
+<script type="text/javascript">
+    RED.nodes.registerType('dropbox.src', {
+        category: 'gulp',
+        color: '#3984FF', // dropbox blue night
+        defaults: {
+            name: { value: "" },
+            path: { value: "" },
+            config: {
+                value: JSON.stringify({
+                    "buffer": false
+                }, undefined, "  ")
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "font-awesome/fa-files-o",
+        label: function () {
+            return this.name || this.path || "dropbox.src";
+        },
+        oneditprepare: function () {
+            const that = this;
+            const configStateId = RED.editor.generateViewStateId("node", this, "");
+            this.configEditor = RED.editor.createEditor({
+                id: 'node-input-config-editor',
+                mode: 'ace/mode/json',
+                value: $("#node-input-config").val(),
+                stateId: configStateId
+            });
+            RED.popover.tooltip($("#node-template-expand-config-editor"), RED._("node-red:common.label.expand"));
+            $("#node-template-expand-config-editor").on("click", function (e) {
+                e.preventDefault();
+                const value = that.configEditor.getValue();
+                that.configEditor.saveView();
+                RED.editor.editText({
+                    // mode: $("#node-input-format").val(),
+                    value: value,
+                    stateId: configStateId,
+                    width: "Infinity",
+                    focus: true,
+                    complete: function (v, cursor) {
+                        that.configEditor.setValue(v, -1);
+                        setTimeout(function () {
+                            that.configEditor.restoreView();
+                            that.configEditor.focus();
+                        }, 250);
+                    }
+                })
+            })
+        },
+        oneditsave: function () {
+
+            try {
+                $("#node-input-config").val(this.configEditor.getValue());
+                this.configEditor.destroy();
+                delete this.configEditor;
+            }
+            catch { }
+        },
+        oneditcancel: function () {
+            this.configEditor.destroy();
+            delete this.configEditor;
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="dropbox.src">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-path"><i class="fa fa-folder-open-o"></i> Path</label>
+        <input type="text" id="node-input-path">
+    </div>
+    <div class="form-row" style="position: relative; margin-bottom: 0px;">
+        <label for="node-input-config"><i class="fa fa-file-code-o"></i> <span>Config</span></label>
+        <input type="hidden" id="node-input-config" autofocus="autofocus">        
+        <div style="position: absolute; right:0;display:inline-block; text-align: right; font-size: 0.8em;">
+            <button type="button" id="node-template-expand-config-editor" class="red-ui-button red-ui-button-small"><i class="fa fa-expand"></i></button>
+        </div>
+        <div class="form-row node-text-editor-row">
+            <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-config-editor" ></div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="dropbox.src">
+    <p>Creates a stream for reading Vinyl objects from the file system.</p>
+    <p>Can be used at the beginning or in the middle of a pipeline to add files based on the given globs.</p>
+
+    <dl class="message-properties">
+        <dt>Config
+        </dt>
+        <dd>Since this node is a wrapper for <a href="https://gulpjs.com/docs/en/api/src">dropbox.src()</a>, 
+            the config parameter is passed to dropbox.src() as the 
+            <a href="https://gulpjs.com/docs/en/api/src/#options">Options</a> object,
+            and all options are available.</dd>
+    </dl>
+    
+</script>
