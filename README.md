@@ -1,4 +1,4 @@
-# gulp-dropbox-adapter #
+# @gulpred/dropbox-adapter #
 
 This plugin allows gulp tasks to interact with DropBox APIs. It provides a .src() function which replaces gulp.src(), allowing remote files to be downloaded as the starting point for a gulp task. There is also a .dest() function, which allows files in a gulp stream to be uploaded.
 

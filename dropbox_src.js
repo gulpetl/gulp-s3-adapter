@@ -2,7 +2,7 @@ const gulp = require('gulp');
 
 const localDefaultConfigObj = { buffer: false }; // default to streaming mode
 const extractConfig = require('./extract-config.js').extractConfig;
-const dbxAdapter = require('gulp-dropbox-adapter');
+const dbxAdapter = require('@gulpred/dropbox-adapter');
 
 module.exports = function (RED) {
     function DropBoxSrcNode(config) {

@@ -4,7 +4,7 @@ const combine = require('stream-combiner')
 const localDefaultConfigObj = {}; // no defaults to override
 const extractConfig = require('./extract-config.js').extractConfig;
 // import {dest} from "./src/plugin.js"
-const dbxAdapter = require('gulp-dropbox-adapter');
+const dbxAdapter = require('@gulpred/dropbox-adapter');
 
 module.exports = function (RED) {
     function DropBoxDestNode(config) {
