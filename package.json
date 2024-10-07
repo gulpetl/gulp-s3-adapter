@@ -1,5 +1,5 @@
 {
-  "name": "gulp-dropbox-adapter",
+  "name": "@gulpred/dropbox-adapter",
   "version": "0.0.1",
   "repository": "https://github.com/gulpetl/gulp-dropbox-adapter",
   "description": "Upload/download files to/from DropBox",
@@ -25,15 +25,15 @@
     }
   },
   "keywords": [
-    "gulpplugin",
-    "request",
-    "http",
-    "https",
-    "REST",
+    "dropbox",
+    "gulpfriendly",
+    "vinyl",
+    "gulp",
+    "gulpfriendly",
     "gulp-etl",
-    "upload",
-    "download",
-    "gulpfriendly"
+    "gulpetl",
+    "etl",
+    "node-red"
   ],
   "homepage": "https://gulpetl.com",
   "dependencies": {
