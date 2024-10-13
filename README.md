@@ -1,6 +1,6 @@
-# @gulpred/dropbox-adapter #
+# @gulpred/s3-adapter #
 
-This plugin allows gulp tasks to interact with DropBox APIs. It provides a .src() function which replaces gulp.src(), allowing remote files to be downloaded as the starting point for a gulp task. There is also a .dest() function, which allows files in a gulp stream to be uploaded.
+This plugin allows gulp tasks to interact with S3 APIs. It provides a .src() function which replaces gulp.src(), allowing remote files to be downloaded as the starting point for a gulp task. There is also a .dest() function, which allows files in a gulp stream to be uploaded.
 
 <!-- This plugin is a gulp wrapper for [request](https://www.npmjs.com/package/request). -->
 

@@ -1,8 +1,8 @@
 {
-  "name": "@gulpred/dropbox-adapter",
-  "version": "0.0.3",
-  "repository": "https://github.com/gulpetl/gulp-dropbox-adapter",
-  "description": "Upload/download files to/from DropBox",
+  "name": "@gulpred/s3-adapter",
+  "version": "0.0.0",
+  "repository": "https://github.com/gulpetl/gulp-s3-adapter",
+  "description": "Upload/download files to/from S3",
   "main": "dist/js/plugin.js",
   "typings": "dist/types/plugin.d.ts",
   "files": [
@@ -20,12 +20,12 @@
   "node-red": {
     "version": ">=2.0.0",
     "nodes": {
-      "dropbox.src": "dropbox_src.js",
-      "dropbox.dest": "dropbox_dest.js"
+      "s3.src": "s3_src.js",
+      "s3.dest": "s3_dest.js"
     }
   },
   "keywords": [
-    "dropbox",
+    "s3",
     "gulpfriendly",
     "vinyl",
     "gulp",
@@ -37,11 +37,11 @@
   ],
   "homepage": "https://gulpetl.com",
   "dependencies": {
-    "dropbox": "^10.34.0",
     "from2": "^2.3.0",
     "gulp-error-handle": "^1.0.1",
     "loglevel": "^1.9.1",
     "merge": "^2.1.1",
+    "minio": "^8.0.1",
     "pkginfo": "^0.4.1",
     "plugin-error": "^2.0.1",
     "request": "^2.88.2",
@@ -52,12 +52,12 @@
   },
   "devDependencies": {
     "@types/from2": "^2.3.5",
-    "@types/node": "^18.19.45",
+    "@types/node": "^18.19.50",
     "@types/request": "^2.48.12",
     "@types/vinyl": "^2.0.12",
     "gulp": "^4.0.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.4",
+    "typescript": "^5.6.3",
     "vitest": "^2.0.5"
   }
 }

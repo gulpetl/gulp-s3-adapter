@@ -2,10 +2,10 @@ const gulp = require('gulp');
 
 const localDefaultConfigObj = { buffer: false }; // default to streaming mode
 const extractConfig = require('./extract-config.js').extractConfig;
-const dbxAdapter = require('@gulpred/dropbox-adapter');
+const dbxAdapter = require('@gulpred/s3-adapter');
 
 module.exports = function (RED) {
-    function DropBoxSrcNode(config) {
+    function S3SrcNode(config) {
         RED.nodes.createNode(this, config);
         this.path = config.path;
         this.config = config.config;
@@ -20,11 +20,11 @@ module.exports = function (RED) {
                     configObj = JSON.parse(this.config);
             }
             catch (err) {
-                done("Unable to parse dropbox.src.config: " + err);
+                done("Unable to parse s3.src.config: " + err);
                 return;
             }
 
-            configObj = extractConfig(configObj, msg?.config, "dropbox.src", localDefaultConfigObj);
+            configObj = extractConfig(configObj, msg?.config, "s3.src", localDefaultConfigObj);
 console.log(configObj)
             // msg = RED.util.cloneMessage(msg);
 
@@ -35,7 +35,7 @@ console.log(configObj)
             msg.plugins = [];
 
             // set the payload to give info on the gulp stream we're creating
-            msg.payload = "dropbox.src: " + node.path;
+            msg.payload = "s3.src: " + node.path;
             msg.topic = "gulp-initialize";
 
             msg.plugins.push({
@@ -61,5 +61,5 @@ console.log(configObj)
         });
 
     }
-    RED.nodes.registerType("dropbox.src", DropBoxSrcNode);
+    RED.nodes.registerType("s3.src", S3SrcNode);
 }

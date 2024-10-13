@@ -4,10 +4,10 @@ const combine = require('stream-combiner')
 const localDefaultConfigObj = {}; // no defaults to override
 const extractConfig = require('./extract-config.js').extractConfig;
 // import {dest} from "./src/plugin.js"
-const dbxAdapter = require('@gulpred/dropbox-adapter');
+const s3Adapter = require('@gulpred/s3-adapter');
 
 module.exports = function (RED) {
-    function DropBoxDestNode(config) {
+    function S3DestNode(config) {
         RED.nodes.createNode(this, config);
         this.path = config.path;
         this.config = config.config;
@@ -20,12 +20,12 @@ module.exports = function (RED) {
                     configObj = JSON.parse(this.config);
             }
             catch (err) {
-                done("Unable to parse dropbox.dest.config: " + err);
+                done("Unable to parse s3.dest.config: " + err);
                 return;
             }
 
-            configObj = extractConfig(configObj, msg?.config, "dropbox.dest", localDefaultConfigObj);
-
+            configObj = extractConfig(configObj, msg?.config, "s3.dest", localDefaultConfigObj);
+console.log(configObj);
             if (!msg.topic?.startsWith("gulp")) {
                 this.status({ fill: "red", shape: "dot", text: "missing .src node" });
             }
@@ -34,13 +34,13 @@ module.exports = function (RED) {
             }
             else if (msg.topic == "gulp-initialize") {
                 if (!msg.plugins) {
-                    node.warn(`dropbox.dest: cannot initialize; missing gulp.src?`)
+                    node.warn(`s3.dest: cannot initialize; missing gulp.src?`)
                     return;
                 }
 
-                console.log(`dropbox.dest: creating gulp stream; combining ${msg.plugins.length} plugin streams`)
+                console.log(`s3.dest: creating gulp stream; combining ${msg.plugins.length} plugin streams`)
                 combine(msg.plugins.map((plugin) => plugin.init()))
-                    .pipe(dbxAdapter.dest(node.path, configObj)
+                    .pipe(s3Adapter.dest(node.path, configObj)
                         .on("data", (file) => {
                             this.status({ fill: "green", shape: "dot", text: "active" });
 
@@ -57,8 +57,8 @@ module.exports = function (RED) {
                         })
                         .on("error", (err) => {
                             // node.error(err?.message,err);
-                            node.error(err?.error,err);
-                            // node.error(err,err);
+                            // node.error(err?.error,err);
+                            node.error(err,err);
                         })
 
                     );
@@ -69,5 +69,5 @@ module.exports = function (RED) {
             send(msg);
         });
     }
-    RED.nodes.registerType("dropbox.dest", DropBoxDestNode);
+    RED.nodes.registerType("s3.dest", S3DestNode);
 }

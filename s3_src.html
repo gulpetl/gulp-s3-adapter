@@ -1,14 +1,13 @@
 <script type="text/javascript">
-    RED.nodes.registerType('dropbox.dest', {
+    RED.nodes.registerType('s3.src', {
         category: 'gulp',
-        color: '#3984FF', // dropbox blue night
+        color: '#448A27',
         defaults: {
             name: { value: "" },
             path: { value: "" },
             config: {
                 value: JSON.stringify({
-                    "overwrite": true,
-                    "append":false
+                    "buffer": false
                 }, undefined, "  ")
             }
         },
@@ -16,9 +15,8 @@
         outputs: 1,
         icon: "font-awesome/fa-files-o",
         label: function () {
-            return this.name || this.path || "dropbox.dest";
+            return this.name || this.path || "s3.src";
         },
-        align:"right",
         oneditprepare: function () {
             const that = this;
             const configStateId = RED.editor.generateViewStateId("node", this, "");
@@ -65,7 +63,7 @@
     });
 </script>
 
-<script type="text/html" data-template-name="dropbox.dest">
+<script type="text/html" data-template-name="s3.src">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -86,17 +84,17 @@
     </div>
 </script>
 
-<script type="text/html" data-help-name="dropbox.dest">
-    <p>Writes Vinyl objects to the file system.</p>
-    <p>Can be used in the middle or at the end of a pipeline to create files on the file system. Whenever a Vinyl object is passed through the stream, it writes the contents and other details out to the file system at the given directory. </p>
+<script type="text/html" data-help-name="s3.src">
+    <p>Creates a stream for reading Vinyl objects from the file system.</p>
+    <p>Can be used at the beginning or in the middle of a pipeline to add files based on the given globs.</p>
 
     <dl class="message-properties">
         <dt>Config
         </dt>
-        <dd>Since this node is a wrapper for <a href="https://gulpjs.com/docs/en/api/dest">dropbox.dest()</a>, 
-            the config parameter is passed to dropbox.dest() as the 
-            <a href="https://gulpjs.com/docs/en/api/dest#options">Options</a> object,
+        <dd>Since this node is a wrapper for <a href="https://gulpjs.com/docs/en/api/src">s3.src()</a>, 
+            the config parameter is passed to s3.src() as the 
+            <a href="https://gulpjs.com/docs/en/api/src/#options">Options</a> object,
             and all options are available.</dd>
     </dl>
-
+    
 </script>
