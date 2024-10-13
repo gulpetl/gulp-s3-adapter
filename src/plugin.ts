@@ -18,14 +18,14 @@ import { Readable } from 'stream'
 /* This is a gulp plugin. It is compliant with best practices for Gulp plugins (see
 https://github.com/gulpjs/gulp/blob/master/docs/writing-a-plugin/guidelines.md#what-does-a-good-plugin-look-like ) */
 
-export function src(this: any, url:string, configObj: any) {
+export function src(this: any, url: string, configObj: any) {
   let result: any;
   if (!configObj) configObj = {}
-  
-  let minioClient  = new Minio.Client(configObj);
+
+  let minioClient = new Minio.Client(configObj);
 
   try {
-    let fileName : string = urlParse(url).pathname || "apiResult.dat"
+    let fileName: string = urlParse(url).pathname || "apiResult.dat"
     fileName = path.basename(fileName)
 
     url = url.split(/[\/\\]+/).join("/"); // ensure posix-style separators 
@@ -52,11 +52,11 @@ export function src(this: any, url:string, configObj: any) {
 
     // make a copy of configObj specific to this file, adding url and leaving original unchanged
     // let optionsCopy = Object.assign({}, configObj, {"url":url})
-    
+
     if (!configObj.buffer) {
       // vinylFile.contents = request(optionsCopy).pipe(through2.obj());      
       // throw new PluginError(PLUGIN_NAME, "Streaming not available")
-console.log("url:", url)
+      console.log("url:", url)
       let pathSections = (url || "").split(/[\/\\]+/); // split directory into sections by slashes/backslashes
       let bucket = pathSections.shift() || ""; // remove first path section as bucket
       // let subfolders = pathSections.join("/"); // reassemble remaining path sections
@@ -65,67 +65,67 @@ console.log("url:", url)
 
       // TODO: add glob support
       let vinylFile = new Vinyl({
-        path:url, // for now: url contains a full file name
+        path: url, // for now: url contains a full file name
         base: path.posix.dirname(url) // use entire dir structure up to the filename as the "base", meaning it will only use subfolders BELOW that level inside the eventual target folder
       });
 
       minioClient.getObject(bucket, pathSections.join("/"))
-     .then(readable => {
-      console.log("got it!")
-      vinylFile.contents = readable;
-      result.push(vinylFile)
-     })
-     .catch ((err) => {
-        console.error("promise error: ", JSON.stringify(err));
-        // cb(err)
-        // throw(err)
-        // node.error(err, msg);
-        // result.emit(new PluginError(PLUGIN_NAME, err))
-      })
-
-     
-    }
-    else {
-
-      
-      throw new PluginError(PLUGIN_NAME, "Buffer mode not available")
-/*
-      let minioClient  = new Minio.Client(configObj);
-
-      // console.log("uploading...")
-      // TODO: don't ignore subfolders
-      dbx.filesDownload({ path: url})
-      // .filesUpload({ path: path.posix.join(directory,file.basename), contents: file.contents as Buffer, mode:mode as any })
-      .then((response:any) => {
-        // console.log(response.result);
-        let vinylFile = new Vinyl({
-          // base: response.name,   
-          cwd:'/', // just guessing here; not sure if this is the right approach. But it seams to work as intended...
-          path:response.result.path_lower,
-          contents:response.result.fileBinary
-        });
-      
-        
-
+        .then(readable => {
+          console.log("got it!")
+          vinylFile.contents = readable;
           result.push(vinylFile)
-          // cb(null, file)          
-          // console.log("worked!")
-      })
-      .catch ((err) => {
+        })
+        .catch((err) => {
           console.error("promise error: ", JSON.stringify(err));
           // cb(err)
           // throw(err)
           // node.error(err, msg);
           // result.emit(new PluginError(PLUGIN_NAME, err))
-      })
-          */
+        })
+
+
+    }
+    else {
+
+
+      throw new PluginError(PLUGIN_NAME, "Buffer mode not available")
+      /*
+            let minioClient  = new Minio.Client(configObj);
+      
+            // console.log("uploading...")
+            // TODO: don't ignore subfolders
+            dbx.filesDownload({ path: url})
+            // .filesUpload({ path: path.posix.join(directory,file.basename), contents: file.contents as Buffer, mode:mode as any })
+            .then((response:any) => {
+              // console.log(response.result);
+              let vinylFile = new Vinyl({
+                // base: response.name,   
+                cwd:'/', // just guessing here; not sure if this is the right approach. But it seams to work as intended...
+                path:response.result.path_lower,
+                contents:response.result.fileBinary
+              });
+            
+              
+      
+                result.push(vinylFile)
+                // cb(null, file)          
+                // console.log("worked!")
+            })
+            .catch ((err) => {
+                console.error("promise error: ", JSON.stringify(err));
+                // cb(err)
+                // throw(err)
+                // node.error(err, msg);
+                // result.emit(new PluginError(PLUGIN_NAME, err))
+            })
+                */
     }
 
-  } 
-  catch (err:any) {
+  }
+  catch (err: any) {
     // emitting here causes some other error: TypeError: Cannot read property 'pipe' of undefined
     // result.emit(new PluginError(PLUGIN_NAME, err))
-    
+
     // For now, bubble error up to calling function
     throw new PluginError(PLUGIN_NAME, err)
   }
@@ -134,88 +134,88 @@ console.log("url:", url)
 }
 
 // export function dest(this: any, url:string, options: any) {
-export function dest(directory:string, configObj: any) {
-    if (!configObj) configObj = {}
-    // override configObj defaults here, if needed
-    // if (configObj.header === undefined) configObj.header = true
-    
-    let minioClient  = new Minio.Client(configObj);
-  
-    // creating a stream through which each file will pass - a new instance will be created and invoked for each file 
-    // see https://stackoverflow.com/a/52432089/5578474 for a note on the "this" param
-    const strm = through2.obj(function (this: any, file: Vinyl, encoding: string, cb: Function) {
-      const self = this
-      let returnErr: any = null
+export function dest(directory: string, configObj: any) {
+  if (!configObj) configObj = {}
+  // override configObj defaults here, if needed
+  // if (configObj.header === undefined) configObj.header = true
 
-      if (file.isNull()) {
-        // return empty file
-        return cb(returnErr, file)
-      }
-      else if (file.isBuffer()) {
-        try {
-          returnErr = new PluginError(PLUGIN_NAME, "Buffer mode not available");
+  let minioClient = new Minio.Client(configObj);
 
-return cb(returnErr, file)          
-/*
-          // load file location settings, setup dropbox client
-          let dbx = new Dropbox(configObj);
-  
-          let mode;
-          // if (msg.payload?.result?.rev)
-          //     mode = { ".tag": "update", "update": msg.payload?.result?.rev };
-          // else
-              mode = { ".tag": "overwrite" };
-  
-          // console.log("uploading...")
-          // TODO: don't ignore subfolders
-          dbx.filesUpload({ path: path.posix.join(directory,file.basename), contents: file.contents as Buffer, mode:mode as any })
-          .then((response) => {
-              // return msg;
-              cb(null, file)
-              // console.log("worked!")
-          })
-          .catch ((err) => {
-              console.error(JSON.stringify(err));
-              cb(err)
-              // throw(err)
-              // node.error(err, msg);
-          })
-*/          
-        }
-        catch (err) {        
-          // console.log(err);
-          cb(err)
-        }
-      }
-      else if (file.isStream()) {
-        // returnErr = new PluginError(PLUGIN_NAME, "Streaming not available");
-        // result.emit(returnErr)
-    
-          try {
-            let pathSections = (directory || "").split(/[\/\\]+/); // split directory into sections by slashes/backslashes
-            let bucket = pathSections.shift() || ""; // remove first path section as bucket
-            let subfolders = pathSections.join("/"); // reassemble remaining path sections
+  // creating a stream through which each file will pass - a new instance will be created and invoked for each file 
+  // see https://stackoverflow.com/a/52432089/5578474 for a note on the "this" param
+  const strm = through2.obj(function (this: any, file: Vinyl, encoding: string, cb: Function) {
+    const self = this
+    let returnErr: any = null
 
-            minioClient.putObject(bucket, path.posix.join(subfolders, (file.relative.split(/[\/\\]+/).join("/"))), file.contents as Readable, undefined,  (err:any, stats:any) => {
-                returnErr = err;
-              if (err) {
-                console.log(err) // err should be null
-                return cb(err, file)
-              }
-              console.log('Success', stats)
-              // return cb(returnErr, file)
-             })
-          }
-          catch (err) {
-            console.log("caught err", err);
-            return cb(err);
-          }
-
-          return cb(returnErr, file)
+    if (file.isNull()) {
+      // return empty file
+      return cb(returnErr, file)
     }
-  
-});
+    else if (file.isBuffer()) {
+      try {
+        returnErr = new PluginError(PLUGIN_NAME, "Buffer mode not available");
+
+        return cb(returnErr, file)
+        /*
+                  // load file location settings, setup dropbox client
+                  let dbx = new Dropbox(configObj);
+          
+                  let mode;
+                  // if (msg.payload?.result?.rev)
+                  //     mode = { ".tag": "update", "update": msg.payload?.result?.rev };
+                  // else
+                      mode = { ".tag": "overwrite" };
+          
+                  // console.log("uploading...")
+                  // TODO: don't ignore subfolders
+                  dbx.filesUpload({ path: path.posix.join(directory,file.basename), contents: file.contents as Buffer, mode:mode as any })
+                  .then((response) => {
+                      // return msg;
+                      cb(null, file)
+                      // console.log("worked!")
+                  })
+                  .catch ((err) => {
+                      console.error(JSON.stringify(err));
+                      cb(err)
+                      // throw(err)
+                      // node.error(err, msg);
+                  })
+        */
+      }
+      catch (err) {
+        // console.log(err);
+        cb(err)
+      }
+    }
+    else if (file.isStream()) {
+      // returnErr = new PluginError(PLUGIN_NAME, "Streaming not available");
+      // result.emit(returnErr)
+
+      try {
+        let pathSections = (directory || "").split(/[\/\\]+/); // split directory into sections by slashes/backslashes
+        let bucket = pathSections.shift() || ""; // remove first path section as bucket
+        let subfolders = pathSections.join("/"); // reassemble remaining path sections
+
+        minioClient.putObject(bucket, path.posix.join(subfolders, (file.relative.split(/[\/\\]+/).join("/"))), file.contents as Readable, undefined, (err: any, stats: any) => {
+          returnErr = err;
+          if (err) {
+            console.log(err) // err should be null
+            return cb(err, file)
+          }
+          console.log('Success', stats)
+          // return cb(returnErr, file)
+        })
+      }
+      catch (err) {
+        console.log("caught err", err);
+        return cb(err);
+      }
+
+      return cb(returnErr, file)
+    }
+
+  });
 
 
-    return strm;
+  return strm;
 }
