@@ -6,9 +6,8 @@ const PLUGIN_NAME = module.exports.name
 import * as loglevel from 'loglevel'
 const log = loglevel.getLogger(PLUGIN_NAME) // get a logger instance based on the project name
 log.setLevel((process.env.DEBUG_LEVEL || 'warn') as loglevel.LogLevelDesc)
-import * as request from 'request'
 import * as path from 'path'
-const from2 = require('from2')
+// const from2 = require('from2')
 import { parse as urlParse } from 'url'
 // import * as fs from 'fs';
 
@@ -29,10 +28,13 @@ export function src(this: any, url:string, configObj: any) {
     let fileName : string = urlParse(url).pathname || "apiResult.dat"
     fileName = path.basename(fileName)
 
+    url = url.split(/[\/\\]+/).join("/"); // ensure posix-style separators 
+
     // from2 returns a writable stream; we put the vinyl file into the stream. This is the core of gulp: Vinyl files
     // inside streams
     // result = from2.obj([vinylFile])
-    result = from2.obj()
+    // result = from2.obj()
+    result = through2.obj() // passthrough stream 
 
     //
     // Now we set the contents of our vinyl file. For now we're using streams; we'll add buffer support later
@@ -54,17 +56,34 @@ export function src(this: any, url:string, configObj: any) {
     if (!configObj.buffer) {
       // vinylFile.contents = request(optionsCopy).pipe(through2.obj());      
       // throw new PluginError(PLUGIN_NAME, "Streaming not available")
-      
+console.log("url:", url)
+      let pathSections = (url || "").split(/[\/\\]+/); // split directory into sections by slashes/backslashes
+      let bucket = pathSections.shift() || ""; // remove first path section as bucket
+      // let subfolders = pathSections.join("/"); // reassemble remaining path sections
+
+      // minioClient.putObject(bucket, path.posix.join(subfolders, (file.relative.split(/[\/\\]+/).join("/"))), file.contents as Readable, undefined,  (err:any, stats:any) => {
+
+      // TODO: add glob support
       let vinylFile = new Vinyl({
-        base: path.posix.dirname(url),
-        cwd:'/', // just guessing here; not sure if this is the right approach. But it seams to work as intended...
-        path:path.posix.basename(url),
-        // contents:response.result.fileBinary
+        path:url, // for now: url contains a full file name
+        base: path.posix.dirname(url) // use entire dir structure up to the filename as the "base", meaning it will only use subfolders BELOW that level inside the eventual target folder
       });
-     minioClient.getObject(path.posix.dirname(url), path.posix.basename(url))
+
+      minioClient.getObject(bucket, pathSections.join("/"))
      .then(readable => {
+      console.log("got it!")
       vinylFile.contents = readable;
+      result.push(vinylFile)
      })
+     .catch ((err) => {
+        console.error("promise error: ", JSON.stringify(err));
+        // cb(err)
+        // throw(err)
+        // node.error(err, msg);
+        // result.emit(new PluginError(PLUGIN_NAME, err))
+      })
+
+     
     }
     else {
 
@@ -108,7 +127,7 @@ export function src(this: any, url:string, configObj: any) {
     // result.emit(new PluginError(PLUGIN_NAME, err))
     
     // For now, bubble error up to calling function
-    // throw new PluginError(PLUGIN_NAME, err)
+    throw new PluginError(PLUGIN_NAME, err)
   }
 
   return result
