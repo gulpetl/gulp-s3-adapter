@@ -15,6 +15,7 @@ const path = require("path");
 const url_1 = require("url");
 // import * as fs from 'fs';
 const Minio = require("minio");
+const client_s3_1 = require("@aws-sdk/client-s3");
 /* This is a gulp plugin. It is compliant with best practices for Gulp plugins (see
 https://github.com/gulpjs/gulp/blob/master/docs/writing-a-plugin/guidelines.md#what-does-a-good-plugin-look-like ) */
 function src(url, configObj) {
@@ -118,7 +119,7 @@ function dest(directory, configObj) {
         configObj = {};
     // override configObj defaults here, if needed
     // if (configObj.header === undefined) configObj.header = true
-    let minioClient = new Minio.Client(configObj);
+    let client = new client_s3_1.S3Client(configObj);
     // creating a stream through which each file will pass - a new instance will be created and invoked for each file 
     // see https://stackoverflow.com/a/52432089/5578474 for a note on the "this" param
     const strm = through2.obj(function (file, encoding, cb) {
@@ -129,61 +130,40 @@ function dest(directory, configObj) {
             return cb(returnErr, file);
         }
         else if (file.isBuffer()) {
-            try {
-                returnErr = new PluginError(PLUGIN_NAME, "Buffer mode not available");
-                return cb(returnErr, file);
-                /*
-                          // load file location settings, setup dropbox client
-                          let dbx = new Dropbox(configObj);
-                  
-                          let mode;
-                          // if (msg.payload?.result?.rev)
-                          //     mode = { ".tag": "update", "update": msg.payload?.result?.rev };
-                          // else
-                              mode = { ".tag": "overwrite" };
-                  
-                          // console.log("uploading...")
-                          // TODO: don't ignore subfolders
-                          dbx.filesUpload({ path: path.posix.join(directory,file.basename), contents: file.contents as Buffer, mode:mode as any })
-                          .then((response) => {
-                              // return msg;
-                              cb(null, file)
-                              // console.log("worked!")
-                          })
-                          .catch ((err) => {
-                              console.error(JSON.stringify(err));
-                              cb(err)
-                              // throw(err)
-                              // node.error(err, msg);
-                          })
-                */
-            }
-            catch (err) {
-                // console.log(err);
-                cb(err);
-            }
-        }
-        else if (file.isStream()) {
-            // returnErr = new PluginError(PLUGIN_NAME, "Streaming not available");
-            // result.emit(returnErr)
+            // returnErr = new PluginError(PLUGIN_NAME, "Buffer mode not available");
+            // return cb(returnErr, file)
             try {
                 let pathSections = (directory || "").split(/[\/\\]+/); // split directory into sections by slashes/backslashes
                 let bucket = pathSections.shift() || ""; // remove first path section as bucket
                 let subfolders = pathSections.join("/"); // reassemble remaining path sections
-                minioClient.putObject(bucket, path.posix.join(subfolders, (file.relative.split(/[\/\\]+/).join("/"))), file.contents, undefined, (err, stats) => {
+                let testo = {
+                    "Body": file.contents,
+                    "Bucket": bucket,
+                    "Key": path.posix.join(subfolders, (file.relative.split(/[\/\\]+/).join("/")))
+                };
+                const command = new client_s3_1.PutObjectCommand(testo);
+                client.send(command)
+                    .then((data) => {
+                    // process data.
+                    console.log('Success');
+                    return cb(returnErr, file);
+                })
+                    .catch((err) => {
                     returnErr = err;
                     if (err) {
                         console.log(err); // err should be null
                         return cb(err, file);
                     }
-                    console.log('Success', stats);
-                    // return cb(returnErr, file)
                 });
             }
             catch (err) {
                 console.log("caught err", err);
                 return cb(err);
             }
+        }
+        else if (file.isStream()) {
+            returnErr = new PluginError(PLUGIN_NAME, "Streaming not available");
+            // result.emit(returnErr)
             return cb(returnErr, file);
         }
     });

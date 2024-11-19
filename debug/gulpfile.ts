@@ -1,5 +1,5 @@
 let gulp = require('gulp')
-import * as apiAdapter from '../src/plugin'
+import * as s3Adapter from '../src/plugin'
 
 import * as loglevel from 'loglevel'
 const log = loglevel.getLogger('gulpfile')
@@ -23,10 +23,32 @@ function switchToBuffer(callback: any) {
   callback();
 }
 
-export function runApiRequest(callback: any) {
-  log.info('gulp task starting for ' + PLUGIN_NAME)
+export function runDest(callback: any) {
+  log.info('gulp task starting for ' + PLUGIN_NAME);
 
-  return gulp.src('../testdata/*.json',{buffer:gulpBufferMode})
+  let localSettings:any;
+  try {
+    localSettings = require("./secret.testsettings.json");
+  }
+  catch {}
+
+  // see https://northflank.com/guides/connect-nodejs-to-minio-with-tls-using-aws-s3
+  let thirdPartyS3Config = {
+    "region": "asdf", // required to be non-empty
+    "credentials": {
+      "accessKeyId": "ACCESS KEY GOES HERE",
+      "secretAccessKey": "SECRET KEY GOES HERE",
+    },
+    "endpoint": "https://minio.storage.whatever.net",
+    "forcePathStyle": true
+  }
+
+  let destConfig = localSettings?.destConfig || thirdPartyS3Config;
+  let localGlob =  localSettings?.localGlob || "../README.md";
+  let targetBucketWithPath = localSettings?.targetBucketWithPath || "public";
+
+  return gulp.src(localGlob,{buffer:gulpBufferMode})  
+  // return gulp.src('../testdata/*.json',{buffer:gulpBufferMode})
     // .pipe(errorHandler(function(err:any) {
     //   log.error('Error: ' + err)
     //   callback(err)
@@ -34,8 +56,7 @@ export function runApiRequest(callback: any) {
     .on('data', function (file:Vinyl) {
       log.info('Starting processing on ' + file.basename)
     })    
-    // .pipe(apiAdapter.request({url:"http://localhost:2019/data/saveChanges", method:"post", headers:{"Content-type": "application/json", 'Accept': 'application/json, text/plain, */*'}}))
-    .pipe(gulp.dest('../testdata/processed'))
+    .pipe(s3Adapter.dest(targetBucketWithPath, destConfig))    
     .on('data', function (file:Vinyl) {
       log.info('Finished processing on ' + file.basename)
     })    
@@ -46,11 +67,11 @@ export function runApiRequest(callback: any) {
 
 }
 
-function runApiSrc(callback: any) {
+function runSrc(callback: any) {
   log.info('gulp task starting for ' + PLUGIN_NAME)
 
   try {
-    return apiAdapter.src("https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png", {buffer:gulpBufferMode})
+    return s3Adapter.src("https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png", {buffer:gulpBufferMode})
       // .pipe(errorHandler(function(err:any) {
       //   log.error('Error: ' + err)
       //   callback(err)
@@ -74,6 +95,6 @@ function runApiSrc(callback: any) {
 
   }
 
-exports.default = gulp.series(runApiRequest)
-exports.runApiRequestBuffer = gulp.series(switchToBuffer, runApiRequest)
-exports.runApiSrc = runApiSrc
+exports.default = gulp.series(runDest)
+exports.runDestBuffer = gulp.series(switchToBuffer, runDest)
+// exports.runSrc = runSrc

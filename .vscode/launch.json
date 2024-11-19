@@ -19,7 +19,7 @@
             "env": {"DEBUG_LEVEL":"info"}
         },
         {        
-            "name": "GulpTester Debug request",
+            "name": "GulpTester Debug Dest",
             "type": "node",
             "request": "launch",
             "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
@@ -38,7 +38,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
             "stopOnEntry": false,
-            "args": ["--gulpfile", "./debug/gulpfile.ts", "runApiSrc"],
+            "args": ["--gulpfile", "./debug/gulpfile.ts", "runSrc"],
             "cwd": "${workspaceRoot}",
             "runtimeArgs": [
                 "--nolazy", "-r", "ts-node/register"
@@ -47,12 +47,12 @@
             "env": {"DEBUG_LEVEL":"debug"}
         },
         {        
-            "name": "GulpTester Debug request - Buffer Mode",
+            "name": "GulpTester Debug dest - Buffer Mode",
             "type": "node",
             "request": "launch",
             "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
             "stopOnEntry": false,
-            "args": ["--gulpfile", "./debug/gulpfile.ts", "runApiRequestBuffer"],
+            "args": ["--gulpfile", "./debug/gulpfile.ts", "runDestBuffer"],
             "cwd": "${workspaceRoot}",
             "runtimeArgs": [
                 "--nolazy", "-r", "ts-node/register"

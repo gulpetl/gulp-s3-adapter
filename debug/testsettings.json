@@ -1,0 +1,13 @@
+{
+    "localGlob": "../README.md",
+    "targetBucketWithPath": "my-bucket/this-folder",
+    "destConfig": {
+        "region": "asdf",
+        "credentials": {
+          "accessKeyId": "ACCESS KEY GOES HERE",
+          "secretAccessKey": "SECRET KEY GOES HERE"
+        },
+        "endpoint": "https://minio.storage.whatever.net",
+        "forcePathStyle": true
+      }
+}
