@@ -6,7 +6,9 @@
   "main": "dist/js/plugin.js",
   "typings": "dist/types/plugin.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "s3_src.*",
+    "s3_dest.*"
   ],
   "scripts": {
     "build": "tsc",
