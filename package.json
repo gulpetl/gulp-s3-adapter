@@ -8,7 +8,8 @@
   "files": [
     "dist",
     "s3_src.*",
-    "s3_dest.*"
+    "s3_dest.*",
+    "extract-config.js"
   ],
   "scripts": {
     "build": "tsc",
