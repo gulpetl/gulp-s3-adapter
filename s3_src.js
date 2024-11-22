@@ -1,8 +1,6 @@
-const gulp = require('gulp');
-
 const localDefaultConfigObj = { buffer: false }; // default to streaming mode
 const extractConfig = require('./extract-config.js').extractConfig;
-const dbxAdapter = require('@gulpred/s3-adapter');
+const s3Adapter = require('@gulpred/s3-adapter');
 
 module.exports = function (RED) {
     function S3SrcNode(config) {
@@ -25,7 +23,7 @@ module.exports = function (RED) {
             }
 
             configObj = extractConfig(configObj, msg?.config, "s3.src", localDefaultConfigObj);
-console.log(configObj)
+            // console.log(configObj)
             // msg = RED.util.cloneMessage(msg);
 
             /** 
@@ -40,9 +38,8 @@ console.log(configObj)
 
             msg.plugins.push({
                 name: config.type,
-                // init:() => gulp.src(node.path, configObj)
                 init: () => {
-                    return dbxAdapter.src(node.path, configObj)
+                    return s3Adapter.src(node.path, configObj)
                         .on("data", () => {
                             this.status({ fill: "green", shape: "dot", text: "active" });
                         })
@@ -51,9 +48,9 @@ console.log(configObj)
                         })
                         .on("error", (err) => {
                             // node.error(err?.message,err);
-                            node.error(err?.error,err);
+                            node.error(err?.error, err);
                             // node.error(err,err);
-                        })                        
+                        })
                 }
             })
 

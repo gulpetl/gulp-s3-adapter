@@ -1,4 +1,3 @@
-// const gulp = require('gulp');
 const combine = require('stream-combiner')
 
 const localDefaultConfigObj = {}; // no defaults to override
@@ -25,7 +24,7 @@ module.exports = function (RED) {
             }
 
             configObj = extractConfig(configObj, msg?.config, "s3.dest", localDefaultConfigObj);
-console.log(configObj);
+            // console.log(configObj);
             if (!msg.topic?.startsWith("gulp")) {
                 this.status({ fill: "red", shape: "dot", text: "missing .src node" });
             }
@@ -48,17 +47,17 @@ console.log(configObj);
                             let fileDescription = `${file.history[0].split(/[\\/]/).pop()} -> ${file.basename}`
                             // console.log("gulp.dest:", fileDescription)
 
-                            send({...msg, topic:"gulp-info", parts:{id:msg._msgid}, _msgid:"", payload:`gulpfile: ${fileDescription}`,gulpfile:file});
+                            send({ ...msg, topic: "gulp-info", parts: { id: msg._msgid }, _msgid: "", payload: `gulpfile: ${fileDescription}`, gulpfile: file });
                         })
                         .on("end", () => {
                             this.status({ fill: "green", shape: "ring", text: "ready" });
 
-                            send({...msg, topic:"gulp-finalize", parts:{id:msg._msgid}, _msgid:""});
+                            send({ ...msg, topic: "gulp-finalize", parts: { id: msg._msgid }, _msgid: "" });
                         })
                         .on("error", (err) => {
                             // node.error(err?.message,err);
                             // node.error(err?.error,err);
-                            node.error(err,err);
+                            node.error(err, err);
                         })
 
                     );
