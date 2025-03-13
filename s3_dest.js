@@ -22,8 +22,9 @@ module.exports = function (RED) {
                 done("Unable to parse s3.dest.config: " + err);
                 return;
             }
-
             configObj = extractConfig(configObj, msg?.config, "s3.dest", localDefaultConfigObj);
+            node.path = node?.path?.trim() || configObj?.path?.trim();
+
             // console.log(configObj);
             if (!msg.topic?.startsWith("gulp")) {
                 this.status({ fill: "red", shape: "dot", text: "missing .src node" });

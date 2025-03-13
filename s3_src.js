@@ -21,10 +21,11 @@ module.exports = function (RED) {
                 done("Unable to parse s3.src.config: " + err);
                 return;
             }
-
             configObj = extractConfig(configObj, msg?.config, "s3.src", localDefaultConfigObj);
             // console.log(configObj)
             // msg = RED.util.cloneMessage(msg);
+            node.path = node?.path?.trim() || configObj?.path?.trim();
+
 
             /** 
              * plugins will be an array of objects where obj.init is a function that returns a stream. This clones well for
