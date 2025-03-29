@@ -17,6 +17,9 @@ importers:
       gulp-error-handle:
         specifier: ^1.0.1
         version: 1.0.1
+      lead:
+        specifier: ^4.0.0
+        version: 4.0.0
       loglevel:
         specifier: ^1.9.1
         version: 1.9.2
@@ -1598,6 +1601,10 @@ packages:
   lead@1.0.0:
     resolution: {integrity: sha512-IpSVCk9AYvLHo5ctcIXxOBpMWUe+4TKN3VPWAKUbJikkmsGp0VrSM8IttVc32D6J4WUsiPE6aEFRNmIoF/gdow==}
     engines: {node: '>= 0.10'}
+
+  lead@4.0.0:
+    resolution: {integrity: sha512-DpMa59o5uGUWWjruMp71e6knmwKU3jRBBn1kjuLWN9EeIOxNeSAwvHf03WIl8g/ZMR2oSQC9ej3yeLBwdDc/pg==}
+    engines: {node: '>=10.13.0'}
 
   liftoff@3.1.0:
     resolution: {integrity: sha512-DlIPlJUkCV0Ips2zf2pJP0unEoT1kwYhiiPUGF3s/jtxTCjziNLoiVVh+jqWOWeFi6mmwQ5fNxvAUyPad4Dfog==}
@@ -4467,6 +4474,8 @@ snapshots:
   lead@1.0.0:
     dependencies:
       flush-write-stream: 1.1.1
+
+  lead@4.0.0: {}
 
   liftoff@3.1.0:
     dependencies:

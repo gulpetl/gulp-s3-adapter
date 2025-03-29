@@ -13,6 +13,7 @@ import { parse as urlParse } from 'url'
 
 import * as Minio from 'minio';
 import { S3Client, PutObjectCommand, PutObjectRequest, S3ClientConfig } from "@aws-sdk/client-s3";
+import lead from 'lead'
 
 /* This is a gulp plugin. It is compliant with best practices for Gulp plugins (see
 https://github.com/gulpjs/gulp/blob/master/docs/writing-a-plugin/guidelines.md#what-does-a-good-plugin-look-like ) */
@@ -197,5 +198,6 @@ export function dest(directory: string, configObj: any) {
   });
 
 
-  return strm;
+  return lead(strm);
+  // return strm;
 }

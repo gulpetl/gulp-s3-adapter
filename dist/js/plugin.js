@@ -16,6 +16,7 @@ const url_1 = require("url");
 // import * as fs from 'fs';
 const Minio = require("minio");
 const client_s3_1 = require("@aws-sdk/client-s3");
+const lead_1 = require("lead");
 /* This is a gulp plugin. It is compliant with best practices for Gulp plugins (see
 https://github.com/gulpjs/gulp/blob/master/docs/writing-a-plugin/guidelines.md#what-does-a-good-plugin-look-like ) */
 function src(url, configObj) {
@@ -167,6 +168,7 @@ function dest(directory, configObj) {
             return cb(returnErr, file);
         }
     });
-    return strm;
+    return (0, lead_1.default)(strm);
+    // return strm;
 }
 //# sourceMappingURL=plugin.js.map
