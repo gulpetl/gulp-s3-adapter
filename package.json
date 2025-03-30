@@ -1,6 +1,6 @@
 {
   "name": "@gulpred/s3-adapter",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "repository": "https://github.com/gulpetl/gulp-s3-adapter",
   "description": "Upload/download files to/from S3",
   "exports-comment": "'require' is for CommonJS, and 'import' is for ESM. We're supporting both; see https://evertpot.com/universal-commonjs-esm-typescript-packages/",
