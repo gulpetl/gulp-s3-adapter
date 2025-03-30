@@ -1,11 +1,15 @@
-const through2 = require('through2')
-import Vinyl = require('vinyl')
-import PluginError = require('plugin-error')
-const pkginfo = require('pkginfo')(module) // project package.json info into module.exports
-const PLUGIN_NAME = module.exports.name
-import * as loglevel from 'loglevel'
+// https://evertpot.com/universal-commonjs-esm-typescript-packages/
+// no esModuleInterop, so use 'import * ...'
+import * as through2 from 'through2'
+import * as Vinyl from 'vinyl'
+import * as PluginError from 'plugin-error'
+
+const PLUGIN_NAME = "gulp-s3-adapter";
+import loglevel from 'loglevel'
 const log = loglevel.getLogger(PLUGIN_NAME) // get a logger instance based on the project name
 log.setLevel((process.env.DEBUG_LEVEL || 'warn') as loglevel.LogLevelDesc)
+function getErrOptions() { return { showStack: log.getLevel() >= log.levels.DEBUG } }
+
 import * as path from 'path'
 // const from2 = require('from2')
 import { parse as urlParse } from 'url'
@@ -56,7 +60,7 @@ export function src(this: any, url: string, configObj: any) {
     if (!configObj.buffer) {
       // vinylFile.contents = request(optionsCopy).pipe(through2.obj());      
       // throw new PluginError(PLUGIN_NAME, "Streaming not available")
-      console.log("url:", url)
+      log.debug("url:", url)
       let pathSections = (url || "").split(/[\/\\]+/); // split directory into sections by slashes/backslashes
       let bucket = pathSections.shift() || ""; // remove first path section as bucket
       // let subfolders = pathSections.join("/"); // reassemble remaining path sections
@@ -71,12 +75,12 @@ export function src(this: any, url: string, configObj: any) {
 
       minioClient.getObject(bucket, pathSections.join("/"))
         .then(readable => {
-          console.log("got it!")
+          log.debug("got it!")
           vinylFile.contents = readable;
           result.push(vinylFile)
         })
         .catch((err) => {
-          console.error("promise error: ", JSON.stringify(err));
+          log.error("promise error: ", JSON.stringify(err));
           // cb(err)
           // throw(err)
           // node.error(err, msg);
@@ -170,20 +174,20 @@ export function dest(directory: string, configObj: any) {
         client.send(command)
         .then((data) => {
             // process data.
-            console.log('Success')
+            log.debug('Success')
             return cb(returnErr, file)
           }
         )
         .catch((err) => {
           returnErr = err;
           if (err) {
-            console.log(err) // err should be null
+            log.error(err) // err should be null
             return cb(err, file)
           }
         })
       }
       catch (err) {
-        console.log("caught err", err);
+        log.error("caught err", err);
         return cb(err);
       }
 
@@ -198,6 +202,6 @@ export function dest(directory: string, configObj: any) {
   });
 
 
+  // Sink the output stream to start flowing
   return lead(strm);
-  // return strm;
 }

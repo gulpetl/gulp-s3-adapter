@@ -57,6 +57,9 @@ importers:
       '@types/request':
         specifier: ^2.48.12
         version: 2.48.12
+      '@types/through2':
+        specifier: ^2.0.41
+        version: 2.0.41
       '@types/vinyl':
         specifier: ^2.0.12
         version: 2.0.12
@@ -706,6 +709,9 @@ packages:
 
   '@types/request@2.48.12':
     resolution: {integrity: sha512-G3sY+NpsA9jnwm0ixhAFQSJ3Q9JkpLZpJbI3GMv0mIAT0y3mRabYeINzal5WOChIiaTEGQYlHOKgkaM9EisWHw==}
+
+  '@types/through2@2.0.41':
+    resolution: {integrity: sha512-ryQ0tidWkb1O1JuYvWKyMLYEtOWDqF5mHerJzKz/gQpoAaJq2l/dsMPBF0B5BNVT34rbARYJ5/tsZwLfUi2kwQ==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -3462,6 +3468,10 @@ snapshots:
       '@types/node': 18.19.50
       '@types/tough-cookie': 4.0.5
       form-data: 2.5.2
+
+  '@types/through2@2.0.41':
+    dependencies:
+      '@types/node': 18.19.50
 
   '@types/tough-cookie@4.0.5': {}
 

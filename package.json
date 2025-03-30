@@ -3,18 +3,28 @@
   "version": "0.0.6",
   "repository": "https://github.com/gulpetl/gulp-s3-adapter",
   "description": "Upload/download files to/from S3",
-  "main": "dist/js/plugin.js",
-  "typings": "dist/types/plugin.d.ts",
+  "exports-comment": "'require' is for CommonJS, and 'import' is for ESM. We're supporting both; see https://evertpot.com/universal-commonjs-esm-typescript-packages/",
+  "exports": {
+    "types": "./esm/plugin.d.ts",
+    "import": "./esm/plugin.js",
+    "require": "./cjs/plugin.js"
+  },
+  "main-comment": "'main' may be used by older tooling; we leave it in just in case",
+  "main": "cjs/plugin.js",
+  "typings": "cjs/plugin.d.ts",
   "files": [
-    "dist",
+    "esm",
+    "cjs",
+    "node-red",
     "s3_src.*",
     "s3_dest.*",
     "extract-config.js"
   ],
   "scripts": {
-    "build": "tsc",
-    "prebuild": "rimraf dist/* --glob",
-    "clean": "rimraf dist/* --glob",
+    "build": "pnpm clean && pnpm compile && pnpm compile-commonjs",
+    "clean": "rimraf esm/* --glob && rimraf cjs/* --glob",
+    "compile": "tsc --module ES2022 --outDir esm/ && echo {\"type\": \"module\"} > esm/package.json",
+    "compile-commonjs": "tsc --module commonjs --outDir cjs/ --declarationDir cjs/ && echo {\"type\": \"commonjs\"} > cjs/package.json",
     "test": "vitest",
     "bump": "npm version patch && git push --tags origin master"
   },
@@ -58,6 +68,7 @@
     "@types/from2": "^2.3.5",
     "@types/node": "^18.19.50",
     "@types/request": "^2.48.12",
+    "@types/through2": "^2.0.41",
     "@types/vinyl": "^2.0.12",
     "gulp": "^4.0.2",
     "ts-node": "^10.9.2",
